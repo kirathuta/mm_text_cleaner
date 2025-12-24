@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myanmar Text Cleaner</title>
+    <title>Myanmar Text Line Joiner</title>
     <style>
         :root {
             --bg: #f8f9fa;
@@ -39,6 +39,7 @@
             font-weight: 600;
             margin: 0;
             font-size: 1.25rem;
+            color: #444;
         }
 
         .actions {
@@ -53,8 +54,9 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             color: #666;
+            font-weight: 500;
         }
 
         #clearBtn:hover {
@@ -67,7 +69,7 @@
             background: var(--accent);
             color: white;
             border: none;
-            display: none; /* Hidden by default */
+            display: none; 
         }
 
         #copyBtn.success {
@@ -85,18 +87,20 @@
             box-sizing: border-box;
             outline: none;
             margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         textarea:focus {
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
         }
 
         .label {
             margin: 24px 0 12px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: #a0a0a0;
         }
 
@@ -106,11 +110,11 @@
             padding: 15px;
             border-radius: 12px;
             border: 1px solid #e0e0e0;
-            word-break: break-all;
-            white-space: pre-wrap;
+            word-break: break-word;
+            white-space: normal;
             line-height: 1.8;
             font-size: 16px;
-            color: #444;
+            color: #2d3436;
         }
     </style>
 </head>
@@ -118,17 +122,17 @@
 
 <div class="container">
     <div class="header">
-        <h2>Myanmar Text Cleaner</h2>
+        <h2>Line Remover</h2>
         <div class="actions">
             <button id="copyBtn">Copy Result</button>
             <button id="clearBtn">Clear</button>
         </div>
     </div>
     
-    <div class="label">Input</div>
-    <textarea id="input" placeholder="Paste Myanmar text here..."></textarea>
+    <div class="label">Input (Text with enters)</div>
+    <textarea id="input" placeholder="စာသားများကို ဤနေရာတွင် ထည့်ပါ..."></textarea>
 
-    <div class="label">Result</div>
+    <div class="label">Result (Enters removed, spaces kept)</div>
     <div id="output"></div>
 </div>
 
@@ -138,16 +142,18 @@
     const clearBtn = document.getElementById('clearBtn');
     const copyBtn = document.getElementById('copyBtn');
 
-    // Real-time cleaning
     inputArea.addEventListener('input', () => {
-        const cleanedText = inputArea.value.replace(/\s+/g, '');
+        // Logic change: 
+        // /[\r\n]+/g matches only carriage returns and new lines
+        // It replaces them with a single space to ensure words don't stick together
+        const cleanedText = inputArea.value.replace(/[\r\n]+/g, ' ').trim();
+        
         outputDiv.textContent = cleanedText;
 
-        // Show/Hide copy button based on content
+        // Show/Hide copy button
         copyBtn.style.display = cleanedText.length > 0 ? 'block' : 'none';
     });
 
-    // Clear function
     clearBtn.addEventListener('click', () => {
         inputArea.value = '';
         outputDiv.textContent = '';
@@ -155,11 +161,9 @@
         inputArea.focus();
     });
 
-    // Copy function
     copyBtn.addEventListener('click', () => {
         const textToCopy = outputDiv.textContent;
         navigator.clipboard.writeText(textToCopy).then(() => {
-            // Visual feedback
             const originalText = copyBtn.textContent;
             copyBtn.textContent = 'Copied!';
             copyBtn.classList.add('success');
@@ -167,7 +171,7 @@
             setTimeout(() => {
                 copyBtn.textContent = originalText;
                 copyBtn.classList.remove('success');
-            }, 2000);
+            }, 1500);
         });
     });
 </script>
